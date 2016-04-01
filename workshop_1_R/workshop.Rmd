@@ -1,0 +1,94 @@
+---
+title: "Introduction to R"
+author: "Grace Yoo, Galen Long"
+date: "March 31, 2016"
+output: html_document
+---
+
+```{R}
+
+# flights, airports, airlines, planes, weather
+```
+
+## Installation
+
+Google it.
+
+## Loading data
+
+```{R}
+# set working directory so R knows where to look for data
+setwd("/Users/mm40078/Documents/projects/datafest2016/data/")
+
+# read a csv into a dataframe
+# type ?read.csv into the console to view the help docs
+workshops <- read.csv("workshops.csv", stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "NULL", ""), sep = ",")
+workshops
+
+workshops[2,] # 2nd row
+workshops$pronouns # pronouns column
+
+# give the num_pets column to the sum() function, returns the sum
+# na.rm to remove NAs from the sum - otherwise, output is just NA (try it!)
+sum(workshops$num_pets, na.rm = TRUE)
+
+# sometimes it's nice to assign things to a variable
+# if we're going to use them multiple times
+x <- workshops$num_pets
+mean(x, na.rm = TRUE)
+median(x, na.rm = TRUE)
+
+# what is the unit of observation?
+# how would we change the unit of observation to a person?
+
+
+# factors, strings, numeric (basic types), missing
+
+
+# basic data structs (data frames)
+# lists, vectors
+# head, tail, indexing
+# save as .rda
+# load packages
+library(nycflights13) # load a package with data (not useful for datafest)
+
+# sampling
+```
+
+## Getting help
+
+```{R}
+# ?
+# basic googling search terms
+# CRAN
+# how to read documentation
+```
+
+## More looking at data
+
+```{R}
+
+# summary stats
+# column names
+# hist, xy scatterplot, pairs plot
+# correlations
+```
+
+## Subsetting columns
+
+```{R}
+x[is.na(x)] <- 0
+```
+
+## Cleaning columns
+
+
+
+## Saving
+
+```{R}
+# write.csv
+```
+
+Link to survey
+Link to repo
