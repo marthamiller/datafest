@@ -11,6 +11,12 @@ date: 2016-04-01
 css: style.css 
 
 
+Download data
+========================================================
+
+https://www.dropbox.com/s/7v6i3rc58juy6z6/workshops.csv?dl=0
+
+
 Loading data
 ========================================================
 class: small-code
@@ -55,7 +61,7 @@ x
 ```
 
 ```
-[1] 4 6 1
+[1] 1 5 6
 ```
 
 ```r
@@ -64,10 +70,10 @@ workshops_sample[,1:5]
 ```
 
 ```
-  first_name last_NAME pronouns gender num_pets
-4    freddie   sanchez   he/him      M       NA
-6       john    karlen   he/him      M        1
-1      grace       yoo  she/her      W        2
+  first_name   last_NAME pronouns gender num_pets
+1      grace         yoo  she/her      W        2
+5    deirdre fitzpatrick  she/her      W        3
+6       john      karlen   he/him      M        1
 ```
 
 Looking at data
@@ -413,6 +419,7 @@ Thank you!
 
 Stick around and find out in our next workshop: `Thinking fast with dplyr`.
 
-Github: https://github.com/massmutual/datafest2016
+Github: https://github.com/massmutual/datafest2016<br />
+Feedback: http://goo.gl/forms/rHnscEWjTL
 
 Contact: gyoo, galenlong [at] massmutual [dot] com

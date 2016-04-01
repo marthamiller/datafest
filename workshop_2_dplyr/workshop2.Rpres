@@ -106,3 +106,14 @@ filter(flights, year != 2013)
 arrange(flights, -arr_delay)
 # mutate as date
 ```
+
+Thank you!
+========================================================
+
+Saturday workshops:<br />
+Saturday 11 - 11:45 AM, *Visualizing data with ggplot2*<br />
+
+Github: https://github.com/massmutual/datafest2016<br />
+Feedback: http://goo.gl/forms/rHnscEWjTL
+
+Contact: gyoo, galenlong [at] massmutual [dot] com
