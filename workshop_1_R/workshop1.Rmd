@@ -14,21 +14,46 @@ output: html_document
 
 Google it.
 
-## Loading data
+## Getting help
 
 ```{R}
-# set working directory so R knows where to look for data
-setwd("/Users/mm40078/Documents/projects/datafest2016/data/")
+# ?
+# basic googling search terms
+# CRAN
+# how to read documentation
+```
+
+## Loading data
+
+```{R echo=TRUE}
+# set working directory so R knows where to look for your project files
+setwd("~/Documents/projects/datafest2016/workshop_1_R/")
 
 # read a csv into a dataframe
 # type ?read.csv into the console to view the help docs
-workshops <- read.csv("workshops.csv", stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "NULL", ""), sep = ",")
+workshops <- read.csv("data/workshops.csv", stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "NULL", ""), sep = ",")
 workshops
 
+# accessing parts of the dataframe
+names(workshops) # column names
+head(workshops, n = 2) # top 2 rows
+tail(workshops, n = 1) # bottom row
 workshops[2,] # 2nd row
-workshops$pronouns # pronouns column
+workshops[,3] # pronouns column
+workshops$pronouns # easier way to access pronouns column
+# ? maybe talk at a v high level diff between indexing, important thing is to tell them if [] or $ indexing doesnt work try the other
 
-# give the num_pets column to the sum() function, returns the sum
+# changing parts of the dataframe
+#   let's say you want to change one of the column names
+#     get the index of the column name and then reassign the value
+gender_idx <- which(names(workshops) == tolower("gender"), arr.ind = TRUE)
+names(workshops)[gender_idx] <- "sex_assigned_at_birth"
+#   let's say you want to manually overwrite grace's worst_trait in the dataframe
+#     find which row grace is and then reassign the value
+grace_row <- which(workshops$first_name == tolower("grace"), arr.ind = TRUE)
+workshops[grace_row, "worst_trait"] <- "has no flaws"
+
+# give the num_pets column to the sum() function --> returns the sum
 # na.rm to remove NAs from the sum - otherwise, output is just NA (try it!)
 sum(workshops$num_pets, na.rm = TRUE)
 
@@ -38,30 +63,35 @@ x <- workshops$num_pets
 mean(x, na.rm = TRUE)
 median(x, na.rm = TRUE)
 
-# what is the unit of observation?
+# TODO:
+# what is the unit of observation? in other words, what does a row represent?
+
+
+# TODO:
 # how would we change the unit of observation to a person?
+# here's one solution: use the aggregate function (?aggregate)
+#   TODO: what are we aggregating BY? what should we do with aggregated values?
+try_agg1 <- aggregate(. ~ first_name + last_name, data = workshops, FUN = paste)
+#   TODO: where did freddie and galen go? what aspects of these rows could have caused their data to disappear?
+try_agg2 <- aggregate(. ~ first_name + last_name, data = workshops, FUN = paste, na.action = na.pass)
+#   TODO: make a better FUN, that removes duplicate values in a paste
+smarter_paste <- function(x){
+  paste(unique(x))
+}
+try_agg3 <- aggregate(. ~ first_name + last_name, data = workshops, FUN = smarter_paste, na.action = na.pass)
 
-
+# TODO:
 # factors, strings, numeric (basic types), missing
 
 
 # basic data structs (data frames)
 # lists, vectors
-# head, tail, indexing
+
 # save as .rda
 # load packages
 library(nycflights13) # load a package with data (not useful for datafest)
 
 # sampling
-```
-
-## Getting help
-
-```{R}
-# ?
-# basic googling search terms
-# CRAN
-# how to read documentation
 ```
 
 ## More looking at data
