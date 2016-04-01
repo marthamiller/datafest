@@ -10,10 +10,6 @@ author: Grace Yoo, Galen Long
 date: 2016-04-01
 css: style.css 
 
-Installation
-========================================================
-
-Google!
 
 Loading data
 ========================================================
@@ -44,6 +40,34 @@ Look at the whole data frame:
 
 ```r
 workshops # don't do this with large data!
+```
+
+Sampling data
+========================================================
+class: small-code
+
+Good for testing out ideas quickly.
+
+
+```r
+x <- sample(nrow(workshops), size = 3)
+x
+```
+
+```
+[1] 4 6 1
+```
+
+```r
+workshops_sample <- workshops[x, ]
+workshops_sample[,1:5]
+```
+
+```
+  first_name last_NAME pronouns gender num_pets
+4    freddie   sanchez   he/him      M       NA
+6       john    karlen   he/him      M        1
+1      grace       yoo  she/her      W        2
 ```
 
 Looking at data

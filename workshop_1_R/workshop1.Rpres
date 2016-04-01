@@ -10,10 +10,6 @@ author: Grace Yoo, Galen Long
 date: 2016-04-01
 css: style.css 
 
-Installation
-========================================================
-
-Google!
 
 Loading data
 ========================================================
@@ -41,6 +37,19 @@ Look at the whole data frame:
 
 ```{r eval=FALSE}
 workshops # don't do this with large data!
+```
+
+Sampling data
+========================================================
+class: small-code
+
+Good for testing out ideas quickly.
+
+```{r}
+x <- sample(nrow(workshops), size = 3)
+x
+workshops_sample <- workshops[x, ]
+workshops_sample[,1:5]
 ```
 
 Looking at data
