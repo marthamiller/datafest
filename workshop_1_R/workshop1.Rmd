@@ -21,33 +21,39 @@ Google it.
 # basic googling search terms
 # CRAN
 # how to read documentation
+# how to use search in R
 ```
 
 ## Loading data
 
 ```{R echo=TRUE}
 # set working directory so R knows where to look for your project files
-setwd("~/Documents/projects/datafest2016/workshop_1_R/")
+setwd("/Users/mm40078/Documents/projects/datafest2016/data")
 
 # read a csv into a dataframe
 # type ?read.csv into the console to view the help docs
-workshops <- read.csv("data/workshops.csv", stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "NULL", ""), sep = ",")
+workshops <- read.csv("workshops.csv", stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "NULL", ""), sep = ",")
 workshops
 
 # accessing parts of the dataframe
 names(workshops) # column names
+nrow(workshops) # number of rows
+ncol(workshops) # number of columns
 head(workshops, n = 2) # top 2 rows
 tail(workshops, n = 1) # bottom row
 workshops[2,] # 2nd row
 workshops[,3] # pronouns column
+workshops[2:nrow(workshops),] # 2nd - last row
+workshops[, c("pronouns","gender")] # give a list of columns
 workshops$pronouns # easier way to access pronouns column
 # ? maybe talk at a v high level diff between indexing, important thing is to tell them if [] or $ indexing doesnt work try the other
 
 # changing parts of the dataframe
-#   let's say you want to change one of the column names
+#   let's say you want to change some of the column names
 #     get the index of the column name and then reassign the value
 gender_idx <- which(names(workshops) == tolower("gender"), arr.ind = TRUE)
 names(workshops)[gender_idx] <- "sex_assigned_at_birth"
+names(workshops)[which(names(workshops) == "last_NAME", arr.ind = TRUE)] <- "last_name"
 #   let's say you want to manually overwrite grace's worst_trait in the dataframe
 #     find which row grace is and then reassign the value
 grace_row <- which(workshops$first_name == tolower("grace"), arr.ind = TRUE)
@@ -103,16 +109,6 @@ library(nycflights13) # load a package with data (not useful for datafest)
 # hist, xy scatterplot, pairs plot
 # correlations
 ```
-
-## Subsetting columns
-
-```{R}
-x[is.na(x)] <- 0
-```
-
-## Cleaning columns
-
-
 
 ## Saving
 
