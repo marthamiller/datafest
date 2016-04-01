@@ -62,8 +62,8 @@ Looking at data
 ========================================================
 class: small-code
 
-- Use `select` to choose columns. Has equivalent `[]` syntax.
-- Use `filter` to select rows. Has equivalent `[]` syntax.
+- Use `select()` to choose columns. Has equivalent `[]` syntax.
+- Use `filter()` to select rows. Has equivalent `[]` syntax.
 - Use `arrange()` to sort rows by column.
 
 ```{r, eval=FALSE}
@@ -94,12 +94,40 @@ flights %>%
   arrange(-num_flights, -total_air_time)
 ```
 
+How do the number of flights change over time?
+========================================================
+class: small-code
+
+You can utilize multiple functions to modify and aggregate variables.
+
+```{r}
+flight_date <- flights %>%
+  mutate(date = paste(year, month, day, sep='-'),
+         date = as.Date(date)) %>%
+  group_by(date) %>%
+  summarise(count = n())
+
+plot(flight_date$date, flight_date$count)
+```
+
+How do the number of flights change over time?
+========================================================
+class: small-code
+
+Regular R functions can piped as well.
+
+```{r}
+select(flights, month) %>%
+  table() %>%
+  barplot()
+```
 
 Do some carriers have more delays than others?
 ========================================================
 class: small-code
 
 ```{r, eval=FALSE}
+# TODO: investigate other variables
 flights %>% 
   select(carrier, arr_delay) %>%
   group_by(carrier) %>%
@@ -137,6 +165,7 @@ group_by(flights, tailnum) %>% summarize(num_flights = n())
 mutate(flights, 
        flight_date = as.Date(paste(year, month, day, sep = '-'))) 
   %>% select(year, month, day, flight_date)
+# TODO add one for join
 ```
 
 
