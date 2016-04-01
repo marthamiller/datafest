@@ -1,0 +1,25 @@
+Introduction to R
+========================================================
+author: Grace Yoo, Galen Long
+date: 2016-04-01
+
+Installation
+========================================================
+
+- Google it
+
+Loading data
+========================================================
+
+```{r}
+setwd("/Users/mm40078/Documents/projects/datafest2016/data/")
+workshops <- read.csv("workshops.csv", stringsAsFactors = FALSE, sep = ",")
+workshops[1:2,1:3]
+```
+
+Slide With Plot
+========================================================
+
+```{r, echo=FALSE}
+plot(cars)
+```
