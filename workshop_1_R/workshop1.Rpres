@@ -43,6 +43,7 @@ Look at the whole data frame:
 
 ```{r eval=FALSE}
 workshops # don't do this with large data!
+View(workshops) # nicer way to view data
 ```
 
 Sampling data

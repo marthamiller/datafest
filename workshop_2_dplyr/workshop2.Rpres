@@ -9,6 +9,11 @@ Thinking fast with dplyr
 author: Freddie Sanchez, Galen Long
 date: 2016-04-01
 
+Resources
+========================================================
+
+Dplyr cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+
 Workshop data
 ========================================================
 class: small-code
@@ -30,7 +35,7 @@ Examples for the flights data:
 
 - Which planes fly the most?
 - Do some days of the week have more flights than others?
-- Do some carriers have more delays than others on average?
+- Do some carriers have more delays than others?
 - Do longer flights tend to have more delays?
 
 Organize questions
@@ -42,61 +47,85 @@ Examples for the flights data:
 
 1. Which planes fly the most?
 2. How do the number of flights change over time?
-3. Which variables have relationships with delays? Can we predict delays?
+3. Which variables have relationships with delays?
 
 dplyr
 ========================================================
-
-There are five basic functions in dplyr syntax:
-
-- `select()`
-- `filter()`
-- `arrange()`
-- `group_by()`
-- `summarize()`
-
-Let's first investigate which planes fly the most.
-
-select()
-========================================================
 class: small-code
-
-Use `select` to choose columns. Has equivalent `[]` syntax.
 
 ```{r}
 # install.packages("dplyr")
 library(dplyr)
+```
 
+Looking at data
+========================================================
+class: small-code
+
+- Use `select` to choose columns. Has equivalent `[]` syntax.
+- Use `filter` to select rows. Has equivalent `[]` syntax.
+- Use `arrange()` to sort rows by column.
+
+```{r, eval=FALSE}
 # flights[,c('year', 'month', 'day', 'origin', 'dest')]
 select(flights, year, month, day, origin, dest)
-```
 
-filter()
-========================================================
-class: small-code
+# flights[flights$year != 2013 & day == 1 | flight == 1613,]
+filter(flights, year != 2013 & day == 1 | flight == 1613)
 
-Use `filter` to select rows. Has equivalent `[]` syntax.
-
-```{r}
-# flights[flights$year != 2013,]
-filter(flights, year != 2013)
-```
-
-Since there's no rows in the data frame, we can infer that the only year in the data is `2013`.
-
-arrange()
-========================================================
-class: small-code
-
-Use `arrange()` to sort rows by column.
-
-```{r}
 flights %>% # pipe data using %>%
   select(year, month, day, arr_delay, origin, dest) %>%
   arrange(-arr_delay)
 ```
 
-Reminder
+
+Which planes fly the most?
+========================================================
+class: small-code
+
+Tailnum uniquely identifies a plane.
+
+```{r}
+flights %>% 
+  group_by(tailnum) %>% 
+  summarize(num_flights = n(), 
+            total_air_time = sum(air_time, na.rm = TRUE), 
+            max_distance = max(distance)) %>% 
+  arrange(-num_flights, -total_air_time)
+```
+
+
+Do some carriers have more delays than others?
+========================================================
+class: small-code
+
+```{r, eval=FALSE}
+flights %>% 
+  select(carrier, arr_delay) %>%
+  group_by(carrier) %>%
+  summarize(num_flights = n(),
+            total_arr_delay = sum(arr_delay, na.rm = TRUE), 
+            delay_per_flight = total_arr_delay / num_flights) %>% 
+  arrange(delay_per_flight)
+```
+
+
+Do some carriers have more delays than others?
+========================================================
+class: small-code
+
+```{r, echo=FALSE}
+flights %>% 
+  select(carrier, arr_delay) %>%
+  group_by(carrier) %>%
+  summarize(num_flights = n(),
+            total_arr_delay = sum(arr_delay, na.rm = TRUE), 
+            delay_per_flight = total_arr_delay / num_flights) %>% 
+  arrange(delay_per_flight)
+```
+
+
+Summary
 ========================================================
 class: small-code
 
@@ -104,14 +133,19 @@ class: small-code
 select(flights, year, month, day, arr_delay, origin, dest)
 filter(flights, year != 2013)
 arrange(flights, -arr_delay)
-# mutate as date
+group_by(flights, tailnum) %>% summarize(num_flights = n())
+mutate(flights, 
+       flight_date = as.Date(paste(year, month, day, sep = '-'))) 
+  %>% select(year, month, day, flight_date)
 ```
+
 
 Thank you!
 ========================================================
 
 Saturday workshops:<br />
-Saturday 11 - 11:45 AM, *Visualizing data with ggplot2*<br />
+Saturday 11 - 11:45 AM, *Visualizing data with ggplot2*, Deirdre<br />
+Saturday 1:30 - 2:15 PM, *Handling dates with lubridate*, John
 
 Github: https://github.com/massmutual/datafest2016<br />
 Feedback: http://goo.gl/forms/rHnscEWjTL

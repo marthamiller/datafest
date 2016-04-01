@@ -5,6 +5,10 @@ date: "March 31, 2016"
 output: html_document
 ---
 
+Code: https://github.com/massmutual/datafest2016
+
+Data: https://www.dropbox.com/s/7v6i3rc58juy6z6/workshops.csv?dl=0
+
 ## Getting help
 
 ```{R, eval=FALSE, echo=TRUE}
@@ -99,12 +103,16 @@ workshops[grace_row, "worst_trait"] <- "has no flaws"
 ## Data types & missing values
 
 ```{R, echo=TRUE}
-# TODO
-# BASICS
-# as.date
-# as.numeric
-# is.na, is.null
-# remind here factors = strings, if having problems with factors, check how read.csv was set up
+# as.<TYPE> converts the types of vectors
+x <- c(1, 2, 3, 4)
+as.character(x)
+
+# there are other 'as' functions:
+?as.date
+?as.numeric
+
+# if you get weird errors with factors, make sure
+# you set stringsAsFactors to FALSE in read.csv
 
 # WHEN TO REMOVE NAs
 #   STATS ON NUMERIC VARIABLES
@@ -169,5 +177,4 @@ save(workshops, file = "your-file-path")
 write.csv(workshops, file = "your-file-path")
 ```
 
-Link to survey
-Link to repo
+## Thanks!

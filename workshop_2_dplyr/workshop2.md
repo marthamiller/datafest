@@ -9,6 +9,11 @@ Thinking fast with dplyr
 author: Freddie Sanchez, Galen Long
 date: 2016-04-01
 
+Resources
+========================================================
+
+Dplyr cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+
 Workshop data
 ========================================================
 class: small-code
@@ -55,7 +60,7 @@ Examples for the flights data:
 
 - Which planes fly the most?
 - Do some days of the week have more flights than others?
-- Do some carriers have more delays than others on average?
+- Do some carriers have more delays than others?
 - Do longer flights tend to have more delays?
 
 Organize questions
@@ -67,109 +72,121 @@ Examples for the flights data:
 
 1. Which planes fly the most?
 2. How do the number of flights change over time?
-3. Which variables have relationships with delays? Can we predict delays?
+3. Which variables have relationships with delays?
 
 dplyr
 ========================================================
-
-There are five basic functions in dplyr syntax:
-
-- `select()`
-- `filter()`
-- `arrange()`
-- `group_by()`
-- `summarize()`
-
-Let's first investigate which planes fly the most.
-
-select()
-========================================================
 class: small-code
-
-Use `select` to choose columns. Has equivalent `[]` syntax.
 
 
 ```r
 # install.packages("dplyr")
 library(dplyr)
+```
 
+Looking at data
+========================================================
+class: small-code
+
+- Use `select` to choose columns. Has equivalent `[]` syntax.
+- Use `filter` to select rows. Has equivalent `[]` syntax.
+- Use `arrange()` to sort rows by column.
+
+
+```r
 # flights[,c('year', 'month', 'day', 'origin', 'dest')]
 select(flights, year, month, day, origin, dest)
-```
 
-```
-Source: local data frame [336,776 x 5]
+# flights[flights$year != 2013 & day == 1 | flight == 1613,]
+filter(flights, year != 2013 & day == 1 | flight == 1613)
 
-    year month   day origin  dest
-   (int) (int) (int)  (chr) (chr)
-1   2013     1     1    EWR   IAH
-2   2013     1     1    LGA   IAH
-3   2013     1     1    JFK   MIA
-4   2013     1     1    JFK   BQN
-5   2013     1     1    LGA   ATL
-6   2013     1     1    EWR   ORD
-7   2013     1     1    EWR   FLL
-8   2013     1     1    LGA   IAD
-9   2013     1     1    JFK   MCO
-10  2013     1     1    LGA   ORD
-..   ...   ...   ...    ...   ...
-```
-
-filter()
-========================================================
-class: small-code
-
-Use `filter` to select rows. Has equivalent `[]` syntax.
-
-
-```r
-# flights[flights$year != 2013,]
-filter(flights, year != 2013)
-```
-
-```
-Source: local data frame [0 x 16]
-
-Variables not shown: year (int), month (int), day (int), dep_time (int),
-  dep_delay (dbl), arr_time (int), arr_delay (dbl), carrier (chr), tailnum
-  (chr), flight (int), origin (chr), dest (chr), air_time (dbl), distance
-  (dbl), hour (dbl), minute (dbl)
-```
-
-Since there's no rows in the data frame, we can infer that the only year in the data is `2013`.
-
-arrange()
-========================================================
-class: small-code
-
-Use `arrange()` to sort rows by column.
-
-
-```r
 flights %>% # pipe data using %>%
   select(year, month, day, arr_delay, origin, dest) %>%
   arrange(-arr_delay)
 ```
 
-```
-Source: local data frame [336,776 x 6]
 
-    year month   day arr_delay origin  dest
-   (int) (int) (int)     (dbl)  (chr) (chr)
-1   2013     1     9      1272    JFK   HNL
-2   2013     6    15      1127    JFK   CMH
-3   2013     1    10      1109    EWR   ORD
-4   2013     9    20      1007    JFK   SFO
-5   2013     7    22       989    JFK   CVG
-6   2013     4    10       931    JFK   TPA
-7   2013     3    17       915    LGA   MSP
-8   2013     7    22       895    LGA   ATL
-9   2013    12     5       878    EWR   MIA
-10  2013     5     3       875    EWR   ORD
-..   ...   ...   ...       ...    ...   ...
+Which planes fly the most?
+========================================================
+class: small-code
+
+Tailnum uniquely identifies a plane.
+
+
+```r
+flights %>% 
+  group_by(tailnum) %>% 
+  summarize(num_flights = n(), 
+            total_air_time = sum(air_time, na.rm = TRUE), 
+            max_distance = max(distance)) %>% 
+  arrange(-num_flights, -total_air_time)
 ```
 
-Reminder
+```
+Source: local data frame [4,044 x 4]
+
+   tailnum num_flights total_air_time max_distance
+     (chr)       (int)          (dbl)        (dbl)
+1                 2512              0         4963
+2   N725MQ         575          48921         1147
+3   N722MQ         513          42664         1147
+4   N723MQ         507          41496         1147
+5   N711MQ         486          40709         1147
+6   N713MQ         483          40031         1147
+7   N258JB         427          35835         1598
+8   N298JB         407          31020         1598
+9   N353JB         404          33687         1598
+10  N351JB         402          30840         1598
+..     ...         ...            ...          ...
+```
+
+
+Do some carriers have more delays than others?
+========================================================
+class: small-code
+
+
+```r
+flights %>% 
+  select(carrier, arr_delay) %>%
+  group_by(carrier) %>%
+  summarize(num_flights = n(),
+            total_arr_delay = sum(arr_delay, na.rm = TRUE), 
+            delay_per_flight = total_arr_delay / num_flights) %>% 
+  arrange(delay_per_flight)
+```
+
+
+Do some carriers have more delays than others?
+========================================================
+class: small-code
+
+
+```
+Source: local data frame [16 x 4]
+
+   carrier num_flights total_arr_delay delay_per_flight
+     (chr)       (int)           (dbl)            (dbl)
+1       AS         714           -7041       -9.8613445
+2       HA         342           -2365       -6.9152047
+3       AA       32729           11638        0.3555868
+4       DL       48110           78366        1.6288921
+5       VX        5162            9027        1.7487408
+6       US       20536           42232        2.0564862
+7       UA       58665          205589        3.5044575
+8       9E       18460          127624        6.9135428
+9       B6       54635          511194        9.3565297
+10      WN       12275          116214        9.4675356
+11      MQ       26397          269767       10.2196083
+12      OO          32             346       10.8125000
+13      YV         601            8463       14.0815308
+14      EV       54173          807324       14.9027006
+15      FL        3260           63868       19.5914110
+16      F9         685           14928       21.7927007
+```
+
+
+Summary
 ========================================================
 class: small-code
 
@@ -178,5 +195,21 @@ class: small-code
 select(flights, year, month, day, arr_delay, origin, dest)
 filter(flights, year != 2013)
 arrange(flights, -arr_delay)
-# mutate as date
+group_by(flights, tailnum) %>% summarize(num_flights = n())
+mutate(flights, 
+       flight_date = as.Date(paste(year, month, day, sep = '-'))) 
+  %>% select(year, month, day, flight_date)
 ```
+
+
+Thank you!
+========================================================
+
+Saturday workshops:<br />
+Saturday 11 - 11:45 AM, *Visualizing data with ggplot2*, Deirdre<br />
+Saturday 1:30 - 2:15 PM, *Handling dates with lubridate*, John
+
+Github: https://github.com/massmutual/datafest2016<br />
+Feedback: http://goo.gl/forms/rHnscEWjTL
+
+Contact: gyoo, galenlong [at] massmutual [dot] com

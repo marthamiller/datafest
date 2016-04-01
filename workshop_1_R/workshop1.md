@@ -46,6 +46,7 @@ Look at the whole data frame:
 
 ```r
 workshops # don't do this with large data!
+View(workshops) # nicer way to view data
 ```
 
 Sampling data
@@ -61,7 +62,7 @@ x
 ```
 
 ```
-[1] 1 5 6
+[1] 5 4 6
 ```
 
 ```r
@@ -71,8 +72,8 @@ workshops_sample[,1:5]
 
 ```
   first_name   last_NAME pronouns gender num_pets
-1      grace         yoo  she/her      W        2
 5    deirdre fitzpatrick  she/her      W        3
+4    freddie     sanchez   he/him      M       NA
 6       john      karlen   he/him      M        1
 ```
 
