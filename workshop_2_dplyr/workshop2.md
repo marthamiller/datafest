@@ -114,11 +114,11 @@ Tailnum uniquely identifies a plane.
 
 
 ```r
-flights %>% 
-  group_by(tailnum) %>% 
-  summarize(num_flights = n(), 
-            total_air_time = sum(air_time, na.rm = TRUE), 
-            max_distance = max(distance)) %>% 
+flights %>%
+  group_by(tailnum) %>%
+  summarize(num_flights = n(),
+            total_air_time = sum(air_time, na.rm = TRUE),
+            max_distance = max(distance)) %>%
   arrange(-num_flights, -total_air_time)
 ```
 
@@ -148,16 +148,31 @@ You can utilize multiple functions to modify and aggregate variables.
 
 
 ```r
-flight_date <- flights %>%
+flights %>%
   mutate(date = paste(year, month, day, sep='-'),
          date = as.Date(date)) %>%
   group_by(date) %>%
-  summarise(count = n())
-
-plot(flight_date$date, flight_date$count)
+  summarise(count = n()) %>% head()
 ```
 
-![plot of chunk unnamed-chunk-5](workshop2-figure/unnamed-chunk-5-1.png) 
+```
+Source: local data frame [6 x 2]
+
+        date count
+      (date) (int)
+1 2013-01-01   842
+2 2013-01-02   943
+3 2013-01-03   914
+4 2013-01-04   915
+5 2013-01-05   720
+6 2013-01-06   832
+```
+
+How do the number of flights change over time?
+========================================================
+class: small-code
+
+<img src="workshop2-figure/unnamed-chunk-6-1.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" width="600px" />
 
 How do the number of flights change over time?
 ========================================================
@@ -172,7 +187,21 @@ select(flights, month) %>%
   barplot()
 ```
 
-![plot of chunk unnamed-chunk-6](workshop2-figure/unnamed-chunk-6-1.png) 
+
+```
+.
+    1     2     3     4     5     6     7     8     9    10    11    12 
+27004 24951 28834 28330 28796 28243 29425 29327 27574 28889 27268 28135 
+```
+
+How do the number of flights change over time?
+========================================================
+class: small-code
+
+Regular R functions can piped as well.
+
+<img src="workshop2-figure/unnamed-chunk-9-1.png" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" width="500px" />
+
 
 Do some carriers have more delays than others?
 ========================================================
@@ -180,45 +209,69 @@ class: small-code
 
 
 ```r
-# TODO: investigate other variables
-flights %>% 
+flights %>%
   select(carrier, arr_delay) %>%
   group_by(carrier) %>%
   summarize(num_flights = n(),
-            total_arr_delay = sum(arr_delay, na.rm = TRUE), 
-            delay_per_flight = total_arr_delay / num_flights) %>% 
-  arrange(delay_per_flight)
+            total_arr_delay = sum(arr_delay, na.rm = TRUE),
+            delay_per_flight = total_arr_delay/num_flights) %>%
+  arrange(-delay_per_flight) %>%
+  head(n = 7)
+```
+
+```
+Source: local data frame [7 x 4]
+
+  carrier num_flights total_arr_delay delay_per_flight
+    (chr)       (int)           (dbl)            (dbl)
+1      F9         685           14928        21.792701
+2      FL        3260           63868        19.591411
+3      EV       54173          807324        14.902701
+4      YV         601            8463        14.081531
+5      OO          32             346        10.812500
+6      MQ       26397          269767        10.219608
+7      WN       12275          116214         9.467536
 ```
 
 
-Do some carriers have more delays than others?
+Does destination contribute to arrival delay?
 ========================================================
 class: small-code
 
 
-```
-Source: local data frame [16 x 4]
 
-   carrier num_flights total_arr_delay delay_per_flight
-     (chr)       (int)           (dbl)            (dbl)
-1       AS         714           -7041       -9.8613445
-2       HA         342           -2365       -6.9152047
-3       AA       32729           11638        0.3555868
-4       DL       48110           78366        1.6288921
-5       VX        5162            9027        1.7487408
-6       US       20536           42232        2.0564862
-7       UA       58665          205589        3.5044575
-8       9E       18460          127624        6.9135428
-9       B6       54635          511194        9.3565297
-10      WN       12275          116214        9.4675356
-11      MQ       26397          269767       10.2196083
-12      OO          32             346       10.8125000
-13      YV         601            8463       14.0815308
-14      EV       54173          807324       14.9027006
-15      FL        3260           63868       19.5914110
-16      F9         685           14928       21.7927007
+```r
+flights %>%
+  select(dest, arr_delay) %>%
+  group_by(dest) %>%
+    summarize(num_flights = n(),
+            total_arr_delay = sum(arr_delay, na.rm = TRUE),
+            delay_per_flight = total_arr_delay / num_flights) %>%
+  filter(num_flights > 25) %>%
+  arrange(delay_per_flight) %>%
+  top_n(5, delay_per_flight)
 ```
 
+```
+Source: local data frame [5 x 4]
+
+   dest num_flights total_arr_delay delay_per_flight
+  (chr)       (int)           (dbl)            (dbl)
+1   MSN         572           11229         19.63112
+2   TYS         631           13912         22.04754
+3   OKC         346            9645         27.87572
+4   TUL         315            9896         31.41587
+5   CAE         116            4427         38.16379
+```
+
+
+Does destination contribute to arrival delay?
+========================================================
+class: small-code
+
+Order table by 'arr_delay', and visualize differences between destinations.
+
+<img src="workshop2-figure/unnamed-chunk-12-1.png" title="plot of chunk unnamed-chunk-12" alt="plot of chunk unnamed-chunk-12" width="475px" />
 
 Summary
 ========================================================
@@ -230,10 +283,9 @@ select(flights, year, month, day, arr_delay, origin, dest)
 filter(flights, year != 2013)
 arrange(flights, -arr_delay)
 group_by(flights, tailnum) %>% summarize(num_flights = n())
-mutate(flights, 
-       flight_date = as.Date(paste(year, month, day, sep = '-'))) 
+mutate(flights,
+       flight_date = as.Date(paste(year, month, day, sep = '-')))
   %>% select(year, month, day, flight_date)
-# TODO add one for join
 ```
 
 
