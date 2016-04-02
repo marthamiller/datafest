@@ -86,11 +86,11 @@ class: small-code
 Tailnum uniquely identifies a plane.
 
 ```{r}
-flights %>% 
-  group_by(tailnum) %>% 
-  summarize(num_flights = n(), 
-            total_air_time = sum(air_time, na.rm = TRUE), 
-            max_distance = max(distance)) %>% 
+flights %>%
+  group_by(tailnum) %>%
+  summarize(num_flights = n(),
+            total_air_time = sum(air_time, na.rm = TRUE),
+            max_distance = max(distance)) %>%
   arrange(-num_flights, -total_air_time)
 ```
 
@@ -101,6 +101,18 @@ class: small-code
 You can utilize multiple functions to modify and aggregate variables.
 
 ```{r}
+flights %>%
+  mutate(date = paste(year, month, day, sep='-'),
+         date = as.Date(date)) %>%
+  group_by(date) %>%
+  summarise(count = n()) %>% head()
+```
+
+How do the number of flights change over time?
+========================================================
+class: small-code
+
+```{r, echo=FALSE, out.width='600px'}
 flight_date <- flights %>%
   mutate(date = paste(year, month, day, sep='-'),
          date = as.Date(date)) %>%
@@ -116,42 +128,82 @@ class: small-code
 
 Regular R functions can piped as well.
 
-```{r}
+```{r, eval=FALSE}
 select(flights, month) %>%
   table() %>%
   barplot()
 ```
 
-Do some carriers have more delays than others?
-========================================================
-class: small-code
-
-```{r, eval=FALSE}
-# TODO: investigate other variables
-flights %>% 
-  select(carrier, arr_delay) %>%
-  group_by(carrier) %>%
-  summarize(num_flights = n(),
-            total_arr_delay = sum(arr_delay, na.rm = TRUE), 
-            delay_per_flight = total_arr_delay / num_flights) %>% 
-  arrange(delay_per_flight)
-```
-
-
-Do some carriers have more delays than others?
-========================================================
-class: small-code
-
 ```{r, echo=FALSE}
-flights %>% 
+select(flights, month) %>%
+  table()
+```
+
+How do the number of flights change over time?
+========================================================
+class: small-code
+
+Regular R functions can piped as well.
+
+```{r, echo=FALSE, out.width='500px'}
+select(flights, month) %>%
+  table() %>%
+  barplot()
+```
+
+
+Do some carriers have more delays than others?
+========================================================
+class: small-code
+
+```{r}
+flights %>%
   select(carrier, arr_delay) %>%
   group_by(carrier) %>%
   summarize(num_flights = n(),
-            total_arr_delay = sum(arr_delay, na.rm = TRUE), 
-            delay_per_flight = total_arr_delay / num_flights) %>% 
-  arrange(delay_per_flight)
+            total_arr_delay = sum(arr_delay, na.rm = TRUE),
+            delay_per_flight = total_arr_delay/num_flights) %>%
+  arrange(-delay_per_flight) %>%
+  head(n = 7)
 ```
 
+
+Does destination contribute to arrival delay?
+========================================================
+class: small-code
+
+
+```{r}
+flights %>%
+  select(dest, arr_delay) %>%
+  group_by(dest) %>%
+    summarize(num_flights = n(),
+            total_arr_delay = sum(arr_delay, na.rm = TRUE),
+            delay_per_flight = total_arr_delay / num_flights) %>%
+  filter(num_flights > 25) %>%
+  arrange(delay_per_flight) %>%
+  top_n(5, delay_per_flight)
+```
+
+
+Does destination contribute to arrival delay?
+========================================================
+class: small-code
+
+Order table by 'arr_delay', and visualize differences between destinations.
+
+```{r, echo=FALSE, out.width='475px'}
+flight_tmp <- flights %>%
+  select(dest, arr_delay) %>%
+  group_by(dest) %>%
+    summarize(num_flights = n(),
+            total_arr_delay = sum(arr_delay, na.rm = TRUE),
+            delay_per_flight = total_arr_delay / num_flights) %>%
+  filter(num_flights > 25) %>%
+  arrange(delay_per_flight)
+
+plot(sort(flight_tmp$delay_per_flight))
+```
 
 Summary
 ========================================================
@@ -162,10 +214,9 @@ select(flights, year, month, day, arr_delay, origin, dest)
 filter(flights, year != 2013)
 arrange(flights, -arr_delay)
 group_by(flights, tailnum) %>% summarize(num_flights = n())
-mutate(flights, 
-       flight_date = as.Date(paste(year, month, day, sep = '-'))) 
+mutate(flights,
+       flight_date = as.Date(paste(year, month, day, sep = '-')))
   %>% select(year, month, day, flight_date)
-# TODO add one for join
 ```
 
 
