@@ -56,10 +56,11 @@ flights %>% arrange(date_time) %>% select(date)
 
 Accessor Functions
 ========================================================
+what day of the week was Dana born on?
 ```{r}
-johns_bday <- ymd("1991-01-20")
-month(johns_bday)
-wday(johns_bday)
+danas_bday <- ymd("1992-06-15")
+month(danas_bday)
+wday(danas_bday)
 ```
 
 First Flight of each Month
@@ -75,3 +76,52 @@ get all flights of a certain plane, "N14228"
 ```{r}
 flights %>% filter(tailnum == 'N14228') %>% arrange(date_time) %>% select(date_time, tailnum)
 ```
+
+
+Right Now!
+========================================================
+what if we want the time right now?
+```{r}
+date <- now()
+
+date
+```
+
+Intervals!
+========================================================
+how old is John?
+```{r}
+johns_bday <- ymd("1991-01-20")
+
+now() - johns_bday
+```
+
+Durations!
+========================================================
+how old is John?
+```{r}
+johns_bday <- ymd("1991-01-20")
+johns_duration <- as.duration(now() - johns_bday)
+
+johns_duration
+```
+
+Durations!
+========================================================
+how old is John... in weeks?
+```{r}
+johns_bday <- ymd("1991-01-20")
+
+johns_duration <- as.duration(now() - johns_bday)
+
+johns_duration / dweeks(1)
+```
+
+Plotting Dates!
+========================================================
+you can combine lubridate with R's plotting functionality
+```{r}
+hist(wday(flights$date))
+```
+
+
