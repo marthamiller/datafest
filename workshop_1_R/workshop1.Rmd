@@ -5,37 +5,55 @@ date: "March 31, 2016"
 output: html_document
 ---
 
-```{R}
+Code: https://github.com/massmutual/datafest2016
 
-# flights, airports, airlines, planes, weather
-```
-
-## Installation
-
-Google it.
+Data: https://www.dropbox.com/s/7v6i3rc58juy6z6/workshops.csv?dl=0
 
 ## Getting help
 
-```{R}
-# ?
-# basic googling search terms
-# CRAN
-# how to read documentation
-# how to use search in R
+```{R, eval=FALSE, echo=TRUE}
+# INSTALL and LOAD packages
+#   put a ? in front of a package, function, dataset, to get info on it
+?install.packages
+install.packages("rmarkdown") # you install a package only once
+?library
+library(rmarkdown) # load packages you need at the beginning of every script
+
+# PRINT something to your console, can be useful for debugging
+print("this might come in handy")
+
+# FREE DATA THAT COMES WITH R
+#   see what datasets are available
+data()
+#   if the dataset doesn't have a period in it, load it like this
+data("women")
+?women # get info on the dataset
+#   if the dataset has a period in it (ie state.region, state.name), load it like this
+data("state")
+?state # info on the dataset includes all the subtables of state (region, name)
 ```
 
 ## Loading data
 
-```{R echo=TRUE}
+```{R, echo=TRUE}
 # set working directory so R knows where to look for your project files
 setwd("/Users/mm40078/Documents/projects/datafest2016/data")
 
-# read a csv into a dataframe
-# type ?read.csv into the console to view the help docs
+# read a csv into a dataframe, use ?read.csv to understand the options!
 workshops <- read.csv("workshops.csv", stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "NULL", ""), sep = ",")
+
+# print the dataframe to console (ugly) --- don't print a huge dataset
 workshops
 
-# accessing parts of the dataframe
+# randomly sample the data, check out ?sample
+x <- sample(nrow(workshops), size = 3)
+x
+workshops_sample <- workshops[x, ]
+```
+
+## Looking at data
+
+```{R, echo=TRUE}
 names(workshops) # column names
 nrow(workshops) # number of rows
 ncol(workshops) # number of columns
@@ -44,77 +62,117 @@ tail(workshops, n = 1) # bottom row
 workshops[2,] # 2nd row
 workshops[,3] # pronouns column
 workshops[2:nrow(workshops),] # 2nd - last row
-workshops[, c("pronouns","gender")] # give a list of columns
+workshops[, c("pronouns","gender")] # get columns in list
 workshops$pronouns # easier way to access pronouns column
-# ? maybe talk at a v high level diff between indexing, important thing is to tell them if [] or $ indexing doesnt work try the other
 
-# changing parts of the dataframe
+# the unique function gives you unique values in a thing.... check out ?unique
+```
+
+## Filtering data
+
+```{R, echo=TRUE}
+# BASIC EXAMPLES
+#     this returns a list of booleans
+workshops$first_name == "galen"
+#     this returns a df with filtered rows
+workshops[workshops$first_name == "galen",]
+#     the which function tells you the index of "TRUE" values for a filter
+which(workshops$first_name == "galen", arr.ind = TRUE)
+#     use grepl to search within strings-- this finds columns with `name` contained in the column name
+workshops[, grepl("name", names(workshops), ignore.case = TRUE)]
+
+# MORE ADVANCED EXAMPLES
+#   rows where `num_pets` > 0 and `gender` is non-male
+workshops[(workshops$num_pets > 0 
+           & ! is.na(workshops$num_pets)
+           & workshops$gender != "male")
+          , 1:6]
 #   let's say you want to change some of the column names
 #     get the index of the column name and then reassign the value
-gender_idx <- which(names(workshops) == tolower("gender"), arr.ind = TRUE)
+gender_idx <- which(names(workshops) == tolower("gender"), arr.ind = TRUE) 
 names(workshops)[gender_idx] <- "sex_assigned_at_birth"
 names(workshops)[which(names(workshops) == "last_NAME", arr.ind = TRUE)] <- "last_name"
 #   let's say you want to manually overwrite grace's worst_trait in the dataframe
 #     find which row grace is and then reassign the value
 grace_row <- which(workshops$first_name == tolower("grace"), arr.ind = TRUE)
 workshops[grace_row, "worst_trait"] <- "has no flaws"
+```
 
-# give the num_pets column to the sum() function --> returns the sum
-# na.rm to remove NAs from the sum - otherwise, output is just NA (try it!)
-sum(workshops$num_pets, na.rm = TRUE)
+## Data types & missing values
 
-# sometimes it's nice to assign things to a variable
-# if we're going to use them multiple times
+```{R, echo=TRUE}
+# as.<TYPE> converts the types of vectors
+x <- c(1, 2, 3, 4)
+as.character(x)
+
+# there are other 'as' functions:
+?as.date
+?as.numeric
+
+# if you get weird errors with factors, make sure
+# you set stringsAsFactors to FALSE in read.csv
+
+# WHEN TO REMOVE NAs
+#   STATS ON NUMERIC VARIABLES
+#   get the sum, mean, median of the number of pets
 x <- workshops$num_pets
+sum(x, na.rm = TRUE)
 mean(x, na.rm = TRUE)
 median(x, na.rm = TRUE)
 
-# TODO:
-# what is the unit of observation? in other words, what does a row represent?
+```
 
+## Aggregating
 
-# TODO:
-# how would we change the unit of observation to a person?
-# here's one solution: use the aggregate function (?aggregate)
-#   TODO: what are we aggregating BY? what should we do with aggregated values?
-try_agg1 <- aggregate(. ~ first_name + last_name, data = workshops, FUN = paste)
-#   TODO: where did freddie and galen go? what aspects of these rows could have caused their data to disappear?
-try_agg2 <- aggregate(. ~ first_name + last_name, data = workshops, FUN = paste, na.action = na.pass)
-#   TODO: make a better FUN, that removes duplicate values in a paste
+``` {R, echo=TRUE}
+# Q: what is the unit of observation? in other words, what does a row represent?
+# A: a row represents a person teaching a workshop (so if someone teaches 2 workshops, they'll be listed twice)
+
+# Q: how would we change the unit of observation to a person?
+# A: one solution is the aggregate function (?aggregate)
+
+# using aggregate() with the formula parameter
+try_agg1 <- aggregate(formula = . ~ first_name + last_name, data = workshops, FUN = paste)
+# um.... where did freddie and galen go? what aspects of these rows could have caused their data to disappear?
+# they were the only rows with NA values... something weird is going on, let's fix it
+try_agg2 <- aggregate(formula = . ~ first_name + last_name, data = workshops, FUN = paste, na.action = na.pass)
+# ok now that that's fixed, why does this make useless aggregations like this: c("lizard", "lizard")... ???
+# it's because FUN = paste blindly pastes everything while aggregating; make a better function for aggregation
 smarter_paste <- function(x){
   paste(unique(x))
 }
-try_agg3 <- aggregate(. ~ first_name + last_name, data = workshops, FUN = smarter_paste, na.action = na.pass)
+try_agg3 <- aggregate(formula = . ~ first_name + last_name, data = workshops, FUN = smarter_paste, na.action = na.pass)
 
-# TODO:
-# factors, strings, numeric (basic types), missing
-
-
-# basic data structs (data frames)
-# lists, vectors
-
-# save as .rda
-# load packages
-library(nycflights13) # load a package with data (not useful for datafest)
-
-# sampling
 ```
 
-## More looking at data
+## Summary stats
 
-```{R}
+```{R, echo=TRUE}
+# NUMERIC summary stats
+mean(workshops$num_pets, na.rm = TRUE) # exclude NAs
+median(workshops$num_pets, na.rm = TRUE)
+min(workshops$num_pets, na.rm = TRUE)
+max(workshops$num_pets, na.rm = TRUE)
+sum(is.na(workshops$num_pets))
+#   does all of the above and more
+summary(workshops$num_pets)
 
-# summary stats
-# column names
-# hist, xy scatterplot, pairs plot
-# correlations
+# CATEGORICAL 
+#   treat categorical as strings, not numbers
+workshops$workshop_code <- as.character(
+  workshops$workshop_code)
+#   finding unique values of a categorical variable can be very useful
+unique(workshops$workshop_name)
 ```
 
-## Saving
+## Saving data
 
-```{R}
-# write.csv
+```{R, eval=FALSE, echo=TRUE}
+# save an .rda which can only be used in R
+save(workshops, file = "your-file-path")
+
+# save a .csv
+write.csv(workshops, file = "your-file-path")
 ```
 
-Link to survey
-Link to repo
+## Thanks!
