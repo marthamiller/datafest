@@ -10,10 +10,12 @@ author: Grace Yoo, Galen Long
 date: 2016-04-01
 css: style.css 
 
-Installation
+
+Download data
 ========================================================
 
-Google!
+https://www.dropbox.com/s/7v6i3rc58juy6z6/workshops.csv?dl=0
+
 
 Loading data
 ========================================================
@@ -44,6 +46,35 @@ Look at the whole data frame:
 
 ```r
 workshops # don't do this with large data!
+View(workshops) # nicer way to view data
+```
+
+Sampling data
+========================================================
+class: small-code
+
+Good for testing out ideas quickly.
+
+
+```r
+x <- sample(nrow(workshops), size = 3)
+x
+```
+
+```
+[1] 2 3 1
+```
+
+```r
+workshops_sample <- workshops[x, ]
+workshops_sample[,1:5]
+```
+
+```
+  first_name last_NAME  pronouns gender num_pets
+2      galen      long they/them lizard        0
+3      galen      long they/them lizard       NA
+1      grace       yoo   she/her      W        2
 ```
 
 Looking at data
@@ -389,6 +420,7 @@ Thank you!
 
 Stick around and find out in our next workshop: `Thinking fast with dplyr`.
 
-Github: https://github.com/massmutual/datafest2016
+Github: https://github.com/massmutual/datafest2016<br />
+Feedback: http://goo.gl/forms/rHnscEWjTL
 
 Contact: gyoo, galenlong [at] massmutual [dot] com
