@@ -62,7 +62,7 @@ x
 ```
 
 ```
-[1] 5 4 6
+[1] 2 3 1
 ```
 
 ```r
@@ -71,10 +71,10 @@ workshops_sample[,1:5]
 ```
 
 ```
-  first_name   last_NAME pronouns gender num_pets
-5    deirdre fitzpatrick  she/her      W        3
-4    freddie     sanchez   he/him      M       NA
-6       john      karlen   he/him      M        1
+  first_name last_NAME  pronouns gender num_pets
+2      galen      long they/them lizard        0
+3      galen      long they/them lizard       NA
+1      grace       yoo   she/her      W        2
 ```
 
 Looking at data
