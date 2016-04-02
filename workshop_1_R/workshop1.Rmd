@@ -14,10 +14,10 @@ Data: https://www.dropbox.com/s/7v6i3rc58juy6z6/workshops.csv?dl=0
 ```{R, eval=FALSE, echo=TRUE}
 # INSTALL and LOAD packages
 #   put a ? in front of a package, function, dataset, to get info on it
-?install.packages()
-install.packages() # you install a package only once
+?install.packages
+install.packages("rmarkdown") # you install a package only once
 ?library
-library() # load packages you need at the beginning of every script
+library(rmarkdown) # load packages you need at the beginning of every script
 
 # PRINT something to your console, can be useful for debugging
 print("this might come in handy")
@@ -42,10 +42,8 @@ setwd("/Users/mm40078/Documents/projects/datafest2016/data")
 # read a csv into a dataframe, use ?read.csv to understand the options!
 workshops <- read.csv("workshops.csv", stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "NULL", ""), sep = ",")
 
-# print the dataframe to console (ugly)
+# print the dataframe to console (ugly) --- don't print a huge dataset
 workshops
-# view the dataframe in a nice window
-View(workshops)
 
 # randomly sample the data, check out ?sample
 x <- sample(nrow(workshops), size = 3)
